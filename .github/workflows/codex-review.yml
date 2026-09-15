@@ -1,0 +1,51 @@
+name: Codex PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Lấy toàn bộ lịch sử Git để tính diff chính xác [2]
+
+      - name: Tạo file diff giữa nhánh gốc và PR
+        run: git diff origin/${{ github.base_ref }}...HEAD > /tmp/pr.diff
+
+      - name: Chạy Codex Review
+        id: review
+        uses: openai/codex-action@v1
+        with:
+          prompt: |
+            Bạn là một kỹ sư senior đang review Pull Request này.
+            File diff nằm tại /tmp/pr.diff.
+            Hãy kiểm tra và chỉ ra: 
+            (1) Lỗi logic (logic errors)
+            (2) Thiếu xử lý ngoại lệ (missing error handling)
+            (3) Nguy cơ bảo mật (security concerns)
+            (4) Lỗ hổng về test coverage (test gaps)
+            Trình bày dưới dạng GitHub-flavored Markdown ngắn gọn, súc tích.
+          sandbox: read-only # Giới hạn chỉ đọc, không thể chỉnh sửa mã nguồn [2, 3]
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }} # Inject khóa API an toàn [2, 4]
+
+      - name: Đăng nhận xét lên PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `### 🤖 Codex Review Findings\n\n${process.env.CODEX_OUTPUT}`
+            });
+        env:
+          CODEX_OUTPUT: ${{ steps.review.outputs.final-message }}

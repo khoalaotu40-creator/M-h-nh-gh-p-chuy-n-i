@@ -1,0 +1,6 @@
+{
+  "name": "Python & React Template",
+  "description": "A full-stack application template with a clear separation of a React/TypeScript frontend and a Python/FastAPI backend.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
