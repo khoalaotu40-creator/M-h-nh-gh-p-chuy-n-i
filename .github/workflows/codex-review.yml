@@ -3,6 +3,7 @@ name: Codex PR Review
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches: [ final_main ]
 
 permissions:
   contents: read
