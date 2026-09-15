@@ -33,13 +33,22 @@ jobs:
             --arg prompt "Bạn là một kỹ sư senior đang review Pull Request này. Dưới đây là Git diff. Hãy chỉ ra: 1. Lỗi logic 2. Thiếu xử lý ngoại lệ 3. Nguy cơ bảo mật. Trình bày dưới dạng Markdown ngắn gọn. \n\nDIFF:\n$DIFF_CONTENT" \
             '{model: $model, messages: [{role: "user", content: $prompt}]}')
             
+          echo "DEBUG: Payload JSON đã tạo thành công."
+            
           RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
             -d "$JSON_PAYLOAD")
             
+          echo "DEBUG: API Response:"
+          echo "$RESPONSE"
+            
           # Trích xuất nội dung từ phản hồi của API
-          REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content')
+          REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "API_ERROR"')
+          
+          if [ "$REVIEW_TEXT" = "API_ERROR" ] || [ "$REVIEW_TEXT" = "null" ]; then
+             REVIEW_TEXT="⚠️ Có lỗi xảy ra khi gọi OpenAI API. Phản hồi thô:\n\`\`\`json\n$RESPONSE\n\`\`\`"
+          fi
           
           # Lưu vào GITHUB_ENV an toàn với EOF
           EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
