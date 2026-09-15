@@ -47,7 +47,6 @@ export default function Sidebar({
 
   useEffect(() => {
     if (!searchQuery.trim()) {
-      setSuggestions([]);
       return;
     }
 
@@ -104,8 +103,12 @@ export default function Sidebar({
 
       const data = await res.json();
       setResult(data);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('An unexpected error occurred');
+      }
     } finally {
       setLoading(false);
     }
@@ -161,7 +164,11 @@ export default function Sidebar({
                 <input
                   type="text"
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSearchQuery(val);
+                    if (!val.trim()) setSuggestions([]);
+                  }}
                   placeholder="E.g., Ho Chi Minh City, Eiffel Tower..."
                   className="w-full border-gray-300 rounded-md border py-2 pl-10 pr-4 focus:ring-indigo-500 focus:border-indigo-500"
                 />

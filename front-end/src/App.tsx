@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import GlobeView from './components/GlobeView';
 import MapView from './components/MapView';
-import { EncodeResult } from './types';
+import { EncodeResult, H3Polygon } from './types';
 import 'leaflet/dist/leaflet.css';
 
 export default function App() {
@@ -17,7 +17,7 @@ export default function App() {
 
   const [result, setResult] = useState<EncodeResult | null>(null);
   const [viewMode, setViewMode] = useState<'globe' | 'map'>('globe');
-  const [globalGrid, setGlobalGrid] = useState<any[]>([]);
+  const [globalGrid, setGlobalGrid] = useState<H3Polygon[]>([]);
 
   useEffect(() => {
     fetch('/api/location/global-grid')

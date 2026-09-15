@@ -1,11 +1,11 @@
 import * as THREE from 'three';
-import { BoundaryPoint } from '../types';
+import { BoundaryPoint, H3Polygon } from '../types';
 
 export const formatBoundary = (boundary: BoundaryPoint[]) => {
   if (!boundary || boundary.length === 0) return [];
   const fixed = [{ ...boundary[0] }];
   for (let i = 1; i < boundary.length; i++) {
-    let prevLng = fixed[i - 1].lng;
+    const prevLng = fixed[i - 1].lng;
     let currLng = boundary[i].lng;
     if (currLng - prevLng > 180) currLng -= 360;
     else if (prevLng - currLng > 180) currLng += 360;
@@ -14,7 +14,7 @@ export const formatBoundary = (boundary: BoundaryPoint[]) => {
 
   // Close polygon
   let firstLng = fixed[0].lng;
-  let lastLng = fixed[fixed.length - 1].lng;
+  const lastLng = fixed[fixed.length - 1].lng;
   if (firstLng - lastLng > 180) firstLng -= 360;
   else if (lastLng - firstLng > 180) firstLng += 360;
   fixed.push({ lat: fixed[0].lat, lng: firstLng });
@@ -28,7 +28,7 @@ export const formatLeafletBoundary = (boundary: BoundaryPoint[]): [number, numbe
   if (!boundary || boundary.length === 0) return [];
   const fixed = [{ ...boundary[0] }];
   for (let i = 1; i < boundary.length; i++) {
-    let prevLng = fixed[i - 1].lng;
+    const prevLng = fixed[i - 1].lng;
     let currLng = boundary[i].lng;
     if (currLng - prevLng > 180) currLng -= 360;
     else if (prevLng - currLng > 180) currLng += 360;
@@ -37,11 +37,11 @@ export const formatLeafletBoundary = (boundary: BoundaryPoint[]): [number, numbe
   return fixed.map((p) => [p.lat, p.lng] as [number, number]);
 };
 
-export const createGlobalGridMesh = (polygons: any[]) => {
+export const createGlobalGridMesh = (polygons: H3Polygon[]) => {
   const lineVertices: number[] = [];
   const r = 100.2; // slightly above surface (100)
 
-  polygons.forEach((poly: any) => {
+  polygons.forEach((poly: H3Polygon) => {
     const b = poly.boundary;
     if (!b || b.length === 0) return;
 

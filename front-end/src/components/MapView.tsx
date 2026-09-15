@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { MapContainer, TileLayer, Polygon as LeafletPolygon, useMap } from 'react-leaflet';
 import { formatLeafletBoundary } from '../utils/geoUtils';
-import { EncodeResult } from '../types';
+import { EncodeResult, H3Polygon } from '../types';
 
 function MapUpdater({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
@@ -20,7 +20,7 @@ interface MapViewProps {
 export default function MapView({ lat, lng, result }: MapViewProps) {
   const selectedPolygonsLeaflet = useMemo(() => {
     return result && result.polygons
-      ? result.polygons.map((poly: any) => {
+      ? result.polygons.map((poly: H3Polygon) => {
           return {
             h3: poly.h3_index,
             isCenter: poly.is_center,
