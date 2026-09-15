@@ -36,3 +36,11 @@ This project is a full-stack application explicitly separated into a TypeScript 
 - **Frontend**: React, TypeScript, Tailwind CSS, Vite
 - **Backend**: Python 3.10+, FastAPI, Uvicorn
 - **Root Server**: Node.js, Express, http-proxy-middleware
+
+## AI Agent Skills Directory
+
+This project maintains a knowledge base of advanced coding patterns and rules, stored in the `agent/skills/` directory. AI Agents MUST refer to these skill files when performing related tasks:
+
+- **`agent/skills/frontend-linting.md`**: Strict ESLint (Flat Config), Prettier, Husky, and CI gate setups.
+- **`agent/skills/react-architecture.md`**: Component modularity, `useEffect` best practices, and TypeScript safety.
+- **`agent/skills/github-actions-bash.md`**: Handling large payloads (ARG_MAX) in CI, `jq --rawfile`, and `curl` data streaming.
