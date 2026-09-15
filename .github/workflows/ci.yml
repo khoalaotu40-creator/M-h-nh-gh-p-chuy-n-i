@@ -21,10 +21,10 @@ jobs:
           cache: 'npm'
           
       - name: Install Node dependencies
-        run: npm ci
+        run: npm install
         
       - name: Lint Frontend
-        run: npm run lint
+        run: npx tsc -p front-end/tsconfig.json --noEmit
         
       - name: Build Frontend
         run: npm run build

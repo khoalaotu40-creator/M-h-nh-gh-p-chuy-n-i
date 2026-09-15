@@ -1,0 +1,8 @@
+node_modules
+dist
+dist-server
+coverage
+server.js
+*.log
+.env
+.DS_Store
