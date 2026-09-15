@@ -35,19 +35,31 @@ jobs:
             
           echo "DEBUG: Payload JSON đã tạo thành công."
             
-          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+          RESPONSE=$(curl -s -w "\n%{http_code}" https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
-            -d "$JSON_PAYLOAD")
+            -d "$JSON_PAYLOAD") || CURL_EXIT_STATUS=$?
             
-          echo "DEBUG: API Response:"
-          echo "$RESPONSE"
+          if [ -n "$CURL_EXIT_STATUS" ] && [ "$CURL_EXIT_STATUS" -ne 0 ]; then
+            REVIEW_TEXT="⚠️ Gọi OpenAI API thất bại do lỗi mạng (cURL error code: $CURL_EXIT_STATUS)."
+          else
+            # Tách HTTP Status Code và Body
+            HTTP_STATUS=$(echo "$RESPONSE" | tail -n1)
+            BODY=$(echo "$RESPONSE" | sed '$d')
             
-          # Trích xuất nội dung từ phản hồi của API
-          REVIEW_TEXT=$(echo "$RESPONSE" | jq -r '.choices[0].message.content // "API_ERROR"')
-          
-          if [ "$REVIEW_TEXT" = "API_ERROR" ] || [ "$REVIEW_TEXT" = "null" ]; then
-             REVIEW_TEXT="⚠️ Có lỗi xảy ra khi gọi OpenAI API. Phản hồi thô:\n\`\`\`json\n$RESPONSE\n\`\`\`"
+            echo "DEBUG: API Response Status: $HTTP_STATUS"
+            echo "DEBUG: API Response Body: $BODY"
+            
+            if [ "$HTTP_STATUS" -ne 200 ]; then
+              REVIEW_TEXT="⚠️ API OpenAI trả về lỗi HTTP $HTTP_STATUS.\n\`\`\`json\n$BODY\n\`\`\`"
+            else
+              # Trích xuất nội dung từ phản hồi của API
+              REVIEW_TEXT=$(echo "$BODY" | jq -r '.choices[0].message.content // "API_ERROR"')
+              
+              if [ "$REVIEW_TEXT" = "API_ERROR" ] || [ "$REVIEW_TEXT" = "null" ]; then
+                 REVIEW_TEXT="⚠️ Không trích xuất được phản hồi từ AI. Phản hồi thô:\n\`\`\`json\n$BODY\n\`\`\`"
+              fi
+            fi
           fi
           
           # Lưu vào GITHUB_ENV an toàn với EOF

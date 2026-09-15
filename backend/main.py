@@ -35,10 +35,13 @@ async def search_location(q: str):
             return data
     except httpx.HTTPStatusError as e:
         print(f"[DEBUG] HTTP Status Error: {e.response.status_code} - {e.response.text}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch locations: API returned {e.response.status_code}")
+        raise HTTPException(status_code=502, detail=f"Nominatim API returned HTTP {e.response.status_code}")
+    except httpx.RequestError as e:
+        print(f"[DEBUG] Network/Request Error: {str(e)}")
+        raise HTTPException(status_code=503, detail="Failed to connect to Nominatim API due to a network error.")
     except Exception as e:
         print(f"[DEBUG] General Error: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to fetch locations: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
 
 class LocationRequest(BaseModel):
     lat: float = Field(..., description="Latitude", ge=-90.0, le=90.0)
