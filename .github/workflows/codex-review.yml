@@ -25,19 +25,19 @@ jobs:
         id: ai_review
         run: |
           # Sử dụng --rawfile của jq để đọc trực tiếp file diff
-          # Cách này sẽ không bị lỗi "Argument list too long" khi diff quá lớn
-          JSON_PAYLOAD=$(jq -n \
+          # Xuất thẳng ra file /tmp/payload.json để tránh lỗi "Argument list too long" trên curl
+          jq -n \
             --arg model "gpt-4o-mini" \
             --arg prompt "Bạn là một kỹ sư senior đang review Pull Request này. Dưới đây là Git diff. Hãy chỉ ra: 1. Lỗi logic 2. Thiếu xử lý ngoại lệ 3. Nguy cơ bảo mật. Trình bày dưới dạng Markdown ngắn gọn. \n\nDIFF:\n" \
             --rawfile diff_content /tmp/pr.diff \
-            '{model: $model, messages: [{role: "user", content: ($prompt + $diff_content)}]}')
+            '{model: $model, messages: [{role: "user", content: ($prompt + $diff_content)}]}' > /tmp/payload.json
             
           echo "DEBUG: Payload JSON đã tạo thành công."
             
           RESPONSE=$(curl -s -w "\n%{http_code}" https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer ${{ secrets.OPENAI_API_KEY }}" \
-            -d "$JSON_PAYLOAD") || CURL_EXIT_STATUS=$?
+            -d @/tmp/payload.json) || CURL_EXIT_STATUS=$?
             
           if [ -n "$CURL_EXIT_STATUS" ] && [ "$CURL_EXIT_STATUS" -ne 0 ]; then
             REVIEW_TEXT="⚠️ Gọi OpenAI API thất bại do lỗi mạng (cURL error code: $CURL_EXIT_STATUS)."
