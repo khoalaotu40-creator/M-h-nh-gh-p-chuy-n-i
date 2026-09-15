@@ -1,6 +1,7 @@
 # Project Architecture Guidelines for AI Agents
 
 ## Overview
+
 This project is a full-stack application explicitly separated into a TypeScript frontend and a Python backend.
 
 - **Frontend**: Built with React, TypeScript, Vite, and Tailwind CSS. Located in `/front-end`.
@@ -31,6 +32,7 @@ This project is a full-stack application explicitly separated into a TypeScript 
    - Do not alter the ports (Node on 3000, Python on 3001) as they are tightly coupled with the deployment environment constraints.
 
 ## Tech Stack
+
 - **Frontend**: React, TypeScript, Tailwind CSS, Vite
 - **Backend**: Python 3.10+, FastAPI, Uvicorn
 - **Root Server**: Node.js, Express, http-proxy-middleware

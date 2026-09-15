@@ -3,29 +3,29 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from "react";
-import Sidebar from "./components/Sidebar";
-import GlobeView from "./components/GlobeView";
-import MapView from "./components/MapView";
-import { EncodeResult } from "./types";
-import "leaflet/dist/leaflet.css";
+import { useState, useEffect } from 'react';
+import Sidebar from './components/Sidebar';
+import GlobeView from './components/GlobeView';
+import MapView from './components/MapView';
+import { EncodeResult } from './types';
+import 'leaflet/dist/leaflet.css';
 
 export default function App() {
-  const [lat, setLat] = useState<string>("10.8700");
-  const [lng, setLng] = useState<string>("106.8031");
-  const [resolution, setResolution] = useState<string>("8");
-  
+  const [lat, setLat] = useState<string>('10.8700');
+  const [lng, setLng] = useState<string>('106.8031');
+  const [resolution, setResolution] = useState<string>('8');
+
   const [result, setResult] = useState<EncodeResult | null>(null);
-  const [viewMode, setViewMode] = useState<"globe" | "map">("globe");
+  const [viewMode, setViewMode] = useState<'globe' | 'map'>('globe');
   const [globalGrid, setGlobalGrid] = useState<any[]>([]);
 
   useEffect(() => {
-    fetch("/api/location/global-grid")
-      .then(res => res.json())
-      .then(data => {
+    fetch('/api/location/global-grid')
+      .then((res) => res.json())
+      .then((data) => {
         if (data.polygons) setGlobalGrid(data.polygons);
       })
-      .catch(err => console.error("Failed to load global grid", err));
+      .catch((err) => console.error('Failed to load global grid', err));
   }, []);
 
   return (
@@ -42,14 +42,14 @@ export default function App() {
         viewMode={viewMode}
         setViewMode={setViewMode}
       />
-      
+
       <div className="hidden md:block flex-1 bg-[#040d21] relative flex items-center justify-center z-0">
         {viewMode === 'globe' ? (
           <GlobeView lat={lat} lng={lng} result={result} globalGrid={globalGrid} />
         ) : (
           <MapView lat={lat} lng={lng} result={result} />
         )}
-        
+
         {/* Simple overlay to make it look nicer */}
         <div className="absolute top-4 right-4 z-10 p-3 bg-black/40 backdrop-blur-md rounded border border-white/20 pointer-events-none">
           <p className="text-white/90 text-xs font-mono">

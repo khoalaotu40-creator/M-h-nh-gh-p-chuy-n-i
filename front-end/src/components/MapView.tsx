@@ -1,7 +1,7 @@
-import { useEffect, useMemo } from "react";
-import { MapContainer, TileLayer, Polygon as LeafletPolygon, useMap } from "react-leaflet";
-import { formatLeafletBoundary } from "../utils/geoUtils";
-import { EncodeResult } from "../types";
+import { useEffect, useMemo } from 'react';
+import { MapContainer, TileLayer, Polygon as LeafletPolygon, useMap } from 'react-leaflet';
+import { formatLeafletBoundary } from '../utils/geoUtils';
+import { EncodeResult } from '../types';
 
 function MapUpdater({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
@@ -19,20 +19,22 @@ interface MapViewProps {
 
 export default function MapView({ lat, lng, result }: MapViewProps) {
   const selectedPolygonsLeaflet = useMemo(() => {
-    return result && result.polygons ? result.polygons.map((poly: any) => {
-      return {
-        h3: poly.h3_index,
-        isCenter: poly.is_center,
-        positions: formatLeafletBoundary(poly.boundary)
-      };
-    }) : [];
+    return result && result.polygons
+      ? result.polygons.map((poly: any) => {
+          return {
+            h3: poly.h3_index,
+            isCenter: poly.is_center,
+            positions: formatLeafletBoundary(poly.boundary),
+          };
+        })
+      : [];
   }, [result]);
 
   return (
     <div className="absolute inset-0 z-0 bg-gray-100">
-      <MapContainer 
-        center={[parseFloat(lat), parseFloat(lng)]} 
-        zoom={13} 
+      <MapContainer
+        center={[parseFloat(lat), parseFloat(lng)]}
+        zoom={13}
         style={{ height: '100%', width: '100%' }}
       >
         <TileLayer
@@ -40,16 +42,16 @@ export default function MapView({ lat, lng, result }: MapViewProps) {
           url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
         />
         <MapUpdater lat={parseFloat(lat)} lng={parseFloat(lng)} />
-        
+
         {selectedPolygonsLeaflet.map((poly, idx) => (
-          <LeafletPolygon 
+          <LeafletPolygon
             key={idx}
             positions={poly.positions}
             pathOptions={{
               color: poly.isCenter ? '#16a34a' : '#22c55e',
               fillColor: '#22c55e',
               fillOpacity: poly.isCenter ? 0.7 : 0.2,
-              weight: 2
+              weight: 2,
             }}
           />
         ))}

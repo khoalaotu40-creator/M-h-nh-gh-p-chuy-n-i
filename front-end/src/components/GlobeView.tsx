@@ -1,7 +1,7 @@
-import { useEffect, useRef, useMemo } from "react";
-import Globe from "react-globe.gl";
-import { formatBoundary, createGlobalGridMesh } from "../utils/geoUtils";
-import { EncodeResult } from "../types";
+import { useEffect, useRef, useMemo } from 'react';
+import Globe from 'react-globe.gl';
+import { formatBoundary, createGlobalGridMesh } from '../utils/geoUtils';
+import { EncodeResult } from '../types';
 
 interface GlobeViewProps {
   lat: string;
@@ -15,25 +15,30 @@ export default function GlobeView({ lat, lng, result, globalGrid }: GlobeViewPro
 
   useEffect(() => {
     if (result && globeEl.current) {
-      globeEl.current.pointOfView({
-        lat: parseFloat(lat),
-        lng: parseFloat(lng),
-        altitude: 0.15
-      }, 1500);
+      globeEl.current.pointOfView(
+        {
+          lat: parseFloat(lat),
+          lng: parseFloat(lng),
+          altitude: 0.15,
+        },
+        1500
+      );
     }
   }, [result, lat, lng]);
 
   const selectedPolygonsData = useMemo(() => {
-    return result && result.polygons ? result.polygons.map((poly: any) => ({
-      properties: { 
-        h3: poly.h3_index,
-        isCenter: poly.is_center
-      },
-      geometry: {
-        type: "Polygon",
-        coordinates: [formatBoundary(poly.boundary)]
-      }
-    })) : [];
+    return result && result.polygons
+      ? result.polygons.map((poly: any) => ({
+          properties: {
+            h3: poly.h3_index,
+            isCenter: poly.is_center,
+          },
+          geometry: {
+            type: 'Polygon',
+            coordinates: [formatBoundary(poly.boundary)],
+          },
+        }))
+      : [];
   }, [result]);
 
   return (
@@ -46,7 +51,9 @@ export default function GlobeView({ lat, lng, result, globalGrid }: GlobeViewPro
         customThreeObject={(d: any) => createGlobalGridMesh(d.polygons)}
         polygonsData={selectedPolygonsData}
         polygonGeoJsonGeometry={(d: any) => d.geometry}
-        polygonCapColor={(d: any) => d.properties.isCenter ? 'rgba(34, 197, 94, 0.7)' : 'rgba(34, 197, 94, 0.2)'}
+        polygonCapColor={(d: any) =>
+          d.properties.isCenter ? 'rgba(34, 197, 94, 0.7)' : 'rgba(34, 197, 94, 0.2)'
+        }
         polygonSideColor={() => 'transparent'}
         polygonStrokeColor={() => '#ffffff'}
         polygonAltitude={0.005}
