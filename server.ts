@@ -9,11 +9,11 @@ async function startServer() {
 
   // Proxy /api requests to the Python backend on port 3001
   app.use(
-    "/api",
     createProxyMiddleware({
+      pathFilter: "/api",
       target: "http://127.0.0.1:3001",
       changeOrigin: true,
-      ws: true, // For websocket support if needed
+      ws: true,
     })
   );
 
