@@ -53,11 +53,15 @@ export default function GlobeView({ lat, lng, result, globalGrid }: GlobeViewPro
         globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
         bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
         customLayerData={globalGrid.length ? [{ polygons: globalGrid }] : []}
-        customThreeObject={(d: Record<string, unknown>) => createGlobalGridMesh(d.polygons as H3Polygon[])}
+        customThreeObject={(d: Record<string, unknown>) =>
+          createGlobalGridMesh(d.polygons as H3Polygon[])
+        }
         polygonsData={selectedPolygonsData}
         polygonGeoJsonGeometry={(d: Record<string, unknown>) => d.geometry as object}
         polygonCapColor={(d: Record<string, unknown>) =>
-          (d.properties as { isCenter: boolean }).isCenter ? 'rgba(34, 197, 94, 0.7)' : 'rgba(34, 197, 94, 0.2)'
+          (d.properties as { isCenter: boolean }).isCenter
+            ? 'rgba(34, 197, 94, 0.7)'
+            : 'rgba(34, 197, 94, 0.2)'
         }
         polygonSideColor={() => 'transparent'}
         polygonStrokeColor={() => '#ffffff'}
